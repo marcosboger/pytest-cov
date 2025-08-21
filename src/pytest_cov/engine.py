@@ -205,12 +205,15 @@ class CovController:
             for node in self.failed_workers:
                 stream.write(f'{node.gateway.id}\n')
 
-        # Produce terminal report if wanted.
-        if any(x in self.cov_report for x in ['term', 'term-missing']):
+        # Produce terminal or markdown report if wanted.
+        if any(x in self.cov_report for x in ['term', 'term-missing', 'markdown', 'markdown-missing']):
+            show_missing = 'term-missing' in self.cov_report or 'markdown-missing' in self.cov_report or None
+            output_format = 'markdown' if ('markdown' in self.cov_report or 'markdown-missing' in self.cov_report) else None
             options = {
-                'show_missing': ('term-missing' in self.cov_report) or None,
+                'show_missing': show_missing,
                 'ignore_errors': True,
                 'file': stream,
+                'output_format': output_format,
                 'precision': self.cov_precision,
             }
             skip_covered = isinstance(self.cov_report, dict) and 'skip-covered' in self.cov_report.values()
